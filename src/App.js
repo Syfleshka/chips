@@ -1,25 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import './App.css'
+import ChipsInput from './components/ChipsInput/ChipsInput'
+import { useState } from 'react'
 
 function App() {
+  const [value, setValue] = useState('это первый чипс, это "второй," чипс')
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
+        <ChipsInput value={value} onChange={setValue} />
         <p>
-          Edit <code>src/App.js</code> and save to reload.
+          Строка: <br />
+          {value}
         </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
       </header>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
