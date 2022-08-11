@@ -2,27 +2,24 @@
   display: flex;
   align-items: flex-start;
   flex-wrap: wrap;
-  min-height: 48px;
   width: 480px;
-  padding: 0 8px;
+  max-width: 90%;
+  padding: 0;
   border: 1px solid white;
   border-radius: 6px;
 }
 .ChipsInput__input {
-  flex: 1;
+  flex: 2;
   border: none;
-  height: 46px;
+  height: 42px;
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 160px;
   font-size: 14px;
-  padding: 4px 0 0 0;
-  background: none;
+  padding: 4px;
   color: white;
-}
-
-.ChipsInput__tags {
-  display: flex;
-  flex-wrap: wrap;
-  padding: 0;
-  margin: 8px 0 0 0;
+  font-family: 'JetBrains Mono', monospace;
+  background: none;
 }
 
 .ChipsInput__tag {
@@ -36,20 +33,24 @@
   font-size: 14px;
   list-style: none;
   border-radius: 6px;
-  margin: 0 8px 8px 0;
+  margin: 4px;
   background: #0052cc;
 }
-
-.ChipsInput .close-icon {
+.ChipsInput__tag > .close-button {
   display: block;
   width: 16px;
   height: 16px;
-  line-height: 16px;
-  text-align: center;
-  font-size: 14px;
-  margin-left: 8px;
-  color: #0052cc;
-  border-radius: 50%;
-  background: #fff;
+  background:none;
   cursor: pointer;
+  border: none;
+  margin: 0 0 0 8px;
+  padding: 0;
+}
+
+.close-button > .close-icon {
+  fill: #ffffff;
+  transition: fill .2s ease-in-out;
+}
+.close-button:hover > .close-icon {
+  fill: #6992d2;
 }
