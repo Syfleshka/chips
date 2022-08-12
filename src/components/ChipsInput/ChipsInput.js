@@ -6,10 +6,10 @@ import CloseIcon from './CloseIcon'
 function ChipsInput({ value, onChange }) {
   const [chips, setChips] = useState([''])
 
-  const handleChips = (event, key) => {
-    console.log(key)
+  const handleChips = ({event, key}) => {
     chips[key] = event.target.value
-    onChange(chips.join(','))
+    const updatedChips = chips.join(',')
+    onChange(makeChips(updatedChips).join(','))
   }
   const removeChip = (chipNumber = 0) => {
     const cloneArray = chips.slice(0, chips.length)
@@ -37,7 +37,7 @@ function ChipsInput({ value, onChange }) {
                 width: chip.length + 'ch',
               }}
               placeholder="Введите"
-              onChange={(e) => handleChips(e, i)}
+              onChange={(e) => handleChips({e, i})}
             />
             <button className="close-button" onClick={() => removeChip(i)}>
               <CloseIcon className="close-icon" />
@@ -50,7 +50,7 @@ function ChipsInput({ value, onChange }) {
         type="text"
         value={chips[chips.length - 1]}
         placeholder="Введите"
-        onChange={(e) => handleChips(e, chips.length - 1)}
+        onChange={(e) => handleChips({event: e, key: chips.length - 1})}
       />
     </ul>
   )

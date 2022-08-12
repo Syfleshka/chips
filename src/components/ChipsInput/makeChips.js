@@ -1,4 +1,4 @@
-export const makeChips = (input) => {
+export const makeChips = (input = '') => {
   const chipsArr = input.split(',')
   let quotePosition = []
 
