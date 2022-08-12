@@ -37,7 +37,7 @@ function ChipsInput({ value, onChange }) {
                 width: chip.length + 'ch',
               }}
               placeholder="Введите"
-              onChange={(e) => handleChips({e, i})}
+              onChange={(e) => handleChips({event: e, key: i})}
             />
             <button className="close-button" onClick={() => removeChip(i)}>
               <CloseIcon className="close-icon" />
