@@ -1,7 +1,7 @@
 .Chips {
   width: 90%;
   max-width: 780px;
-  text-align:left;
+  text-align: left;
   position: relative;
 }
 .ChipsInput {
@@ -10,12 +10,36 @@
   box-sizing: border-box;
   flex-wrap: wrap;
   overflow: hidden;
-  width:100%;
+  width: 100%;
   padding: 0;
-  margin:0 0 18px 0;
+  margin: 0 0 18px 0;
   border: 1px solid white;
   border-radius: 6px;
 }
+
+.ChipsInput__tag {
+  width: auto;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+
+  padding: 0 8px;
+  font-size: 14px;
+  list-style: none;
+  border-radius: 6px;
+  margin: 4px;
+  border: 1px solid #0052cc;
+  background: #0052cc;
+  box-sizing: border-box;
+  animation: tag-appear 0.4s 1 ease-out;
+  transition: border 0.2s ease-in-out;
+}
+.ChipsInput__tag.error {
+  border: solid 1px brown;
+}
+
 .ChipsInput__input {
   flex: 2;
   border: none;
@@ -29,8 +53,13 @@
   font-family: 'JetBrains Mono', monospace;
   background: none;
 }
+.ChipsInput__input.error {
+  color: brown;
+}
+
 .ChipsInput-tag__input {
   border: none;
+  box-sizing: border-box;
   width: 100%;
   min-width: 10px;
   font-size: 14px;
@@ -38,6 +67,10 @@
   color: white;
   font-family: 'JetBrains Mono', monospace;
   background: none;
+  transition: border 0.2s;
+}
+.ChipsInput-tag__input.error {
+  border: solid 1px brown;
 }
 
 .ChipsInput-tag__input {
@@ -59,21 +92,6 @@
   z-index: -1;
 }
 
-.ChipsInput__tag {
-  width: auto;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  padding: 0 8px;
-  font-size: 14px;
-  list-style: none;
-  border-radius: 6px;
-  margin: 4px;
-  background: #0052cc;
-  animation: tag-appear .4s 1 ease-out;
-}
 .ChipsInput__tag > .close-button {
   display: block;
   width: 16px;
@@ -83,7 +101,7 @@
   border: none;
   margin: 0 0 0 8px;
   padding: 0;
-  animation: close-tag-appear .4s 1 ease-out;
+  animation: close-tag-appear 0.4s 1 ease-out;
 }
 
 .ChipsInput__error {
@@ -91,6 +109,12 @@
   bottom: 0;
   font-size: 12px;
   color: brown;
+  display:none;
+  transition: opacity;
+}
+.ChipsInput__error.error {
+  display: inline-block;
+  animation: tag-appear 0.2s 1 ease-out;
 }
 
 .close-button > .close-icon {
