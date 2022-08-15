@@ -3,7 +3,10 @@ export const makeChips = (input = '') => {
   let quotePosition = []
 
   for (let i = 0; i < chipsArr.length; i++) {
-    if (chipsArr[i].search('"') > -1) {
+    if (
+      chipsArr[i].search('"') > -1 &&
+      (chipsArr[i].match(/"/g) || []).length % 2 > 0
+    ) {
       quotePosition.push(i)
     }
     if (
@@ -20,7 +23,8 @@ export const makeChips = (input = '') => {
       quotePosition = []
     }
   }
-  return chipsArr.filter(
+  const filteredElements = chipsArr.filter(
     (element, i) => element !== '' || i === chipsArr.length - 1
   )
+  return [...filteredElements]
 }
