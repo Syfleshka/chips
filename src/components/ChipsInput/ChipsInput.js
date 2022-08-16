@@ -42,6 +42,7 @@ function ChipsInput({ value, onChange }) {
       keys: [...error.keys, key],
     }))
   }
+  console.log(error)
 
   const removeChips = useCallback((keyList = []) => {
     const chipsClone = chips.slice()
@@ -87,7 +88,7 @@ function ChipsInput({ value, onChange }) {
       })
       removeErrors([key])
     } else {
-      addError(key)
+      addError({key})
     }
   }
 
@@ -98,7 +99,7 @@ function ChipsInput({ value, onChange }) {
       if (isInputEmpty) setChips([...chips, ''])
       removeErrors([key])
     } else {
-      addError(key)
+      addError({key})
     }
   }
 
