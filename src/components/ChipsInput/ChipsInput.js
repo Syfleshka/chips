@@ -1,5 +1,5 @@
 import './ChipsInput.scss'
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { makeChips } from './makeChips'
 import Chip from './Chip'
 import { MainChip } from './MainChip'
@@ -19,7 +19,7 @@ function ChipsInput({ value, onChange }) {
 
   const isQuotesClosed = (value) => (value.match(/"/g) || []).length % 2 === 0
 
-  const removeErrors = (keyList = []) => {
+  const removeErrors = useCallback((keyList = []) => {
     const errorKeys = error.keys.slice()
     keyList
       .slice()
@@ -34,7 +34,7 @@ function ChipsInput({ value, onChange }) {
       text: prevState.text,
       keys: errorKeys,
     }))
-  }
+  }, [error.keys])
 
   const addError = ({ key }) => {
     setError((prevState) => ({
@@ -43,7 +43,7 @@ function ChipsInput({ value, onChange }) {
     }))
   }
 
-  const removeChips = (keyList = []) => {
+  const removeChips = useCallback((keyList = []) => {
     const chipsClone = chips.slice()
     keyList
       .slice()
@@ -53,7 +53,7 @@ function ChipsInput({ value, onChange }) {
       })
     setChips(chipsClone)
     removeErrors(keyList)
-  }
+  }, [chips, removeErrors])
 
   const setChipsHelper = ({ value, key }) => {
     const chipsClone = chips.slice()
@@ -118,7 +118,12 @@ function ChipsInput({ value, onChange }) {
   }
 
   const handleKeyPress = ({ event, key }) => {
-    if (event.key === 'Backspace' && event.target.selectionEnd === 0) {
+    if (
+      event.key === 'Backspace'&&
+      event.target.selectionEnd === 0 &&
+      event.target.selectionStart === 0 &&
+      selection.list.length === 0
+    ) {
       removeChips([key - 1])
     }
   }
@@ -132,54 +137,61 @@ function ChipsInput({ value, onChange }) {
       }))
     }
   }
-  const startSelection = () => {
+  const startSelection = useCallback(() => {
     if (!selection.isStarted) {
       setSelection((prevState) => ({
         list: prevState.list,
-        isStarted: true
+        isStarted: true,
       }))
     }
-  }
-  const endSelection = () => {
+  },[selection.isStarted])
+  const endSelection = useCallback(() => {
     if (selection.isStarted) {
       setSelection((prevState) => ({
         list: prevState.list,
-        isStarted: false
+        isStarted: false,
       }))
     }
-  }
+  },[selection.isStarted])
 
-  const resetSelection = () => {
+  const resetSelection = useCallback(() => {
     if (!selection.isStarted) {
       setSelection({ ...selection, list: [] })
     }
-  }
-
-  const deleteSelection = ({ event }) => {
-    if ( (event.key === 'Backspace' || event.key === 'Delete') && selection.isStarted) {
-      removeChips(selection.list)
-      resetSelection()
-    }
-  }
+  },[selection])
 
   useEffect(() => {
     onChange(chips.join(','))
-  }, [chips, onChange])
+
+    const deleteSelection = (event) => {
+      if (event.key === 'Delete') {
+        removeChips(selection.list)
+      }
+      resetSelection()
+    }
+
+    const mouseDownSelection = () => {
+      resetSelection()
+      startSelection()
+    }
+
+    document.addEventListener('keyup', deleteSelection)
+    document.addEventListener('mousedown', mouseDownSelection)
+    document.addEventListener('mouseup', endSelection)
+    return () => {
+      document.removeEventListener('keyup', deleteSelection)
+      document.removeEventListener('mousedown', mouseDownSelection)
+      document.removeEventListener('mouseup', endSelection)
+    }
+  }, [chips, onChange, removeChips, resetSelection, selection.list, startSelection, endSelection])
 
   return (
     <div
       className="Chips"
-      onMouseDown={() => {
-        resetSelection()
-        startSelection()
-      }}
-      onMouseUp={() => endSelection()}
       onMouseLeave={() => {
         endSelection()
-        resetSelection()
       }}
       tabIndex={-1}
-      onKeyDown={(event) => deleteSelection({ event })}
       ref={chipsRef}
     >
       <ul className="ChipsInput">
