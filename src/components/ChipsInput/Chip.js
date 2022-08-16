@@ -42,7 +42,7 @@ function Chip({
         }}
         onBlur={(event) => {unSelectChip(event)}}
         onChange={onChange}
-        disabled={selection.list.includes(searchElement) || !isSelected}
+        disabled={selection.list.includes(searchElement)}
       />
       <button className="close-button" onClick={closeButtonOnClick}>
         <CloseIcon className="close-icon" />

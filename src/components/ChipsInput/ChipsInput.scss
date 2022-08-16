@@ -97,6 +97,10 @@
   width: 10px;
 }
 
+.ChipsInput__tag.active > .ChipsInput-tag__input {
+  cursor:auto;
+}
+
 .ChipsInput-tag__input:active {
   width: auto;
 }
