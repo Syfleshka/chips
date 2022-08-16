@@ -23,8 +23,5 @@ export const makeChips = (input = '') => {
       quotePosition = []
     }
   }
-  const filteredElements = chipsArr.filter(
-    (element, i) => element !== '' || i === chipsArr.length - 1
-  )
-  return [...filteredElements]
+  return chipsArr
 }

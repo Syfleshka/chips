@@ -1,7 +1,9 @@
 import './ChipsInput.scss'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { makeChips } from './makeChips'
-import CloseIcon from './CloseIcon'
+import Chip from './Chip'
+import { MainChip } from './MainChip'
+import { disableTextSelection } from './disableTextSelection'
 
 function ChipsInput({ value, onChange }) {
   const [chips, setChips] = useState(makeChips(value))
@@ -9,64 +11,161 @@ function ChipsInput({ value, onChange }) {
     text: 'Закройте кавычки с двух сторон',
     keys: [],
   })
+  const [selection, setSelection] = useState({
+    isStarted: false,
+    list: [],
+  })
+  const chipsRef = useRef(null)
 
   const isQuotesClosed = (value) => (value.match(/"/g) || []).length % 2 === 0
 
-  const removeError = (key) => {
+  const removeErrors = (keyList = []) => {
     const errorKeys = error.keys.slice()
-    const index = error.keys.indexOf(key);
-    if (index !== -1) {
-      errorKeys.splice(index, 1);
-    }
-    setError({ ...error, keys: errorKeys })
+    keyList
+      .slice()
+      .sort((a, b) => b - a)
+      .forEach((key) => {
+        const index = error.keys.indexOf(key)
+        if (index !== -1) {
+          errorKeys.splice(index, 1)
+        }
+      })
+    setError((prevState) => ({
+      text: prevState.text,
+      keys: errorKeys,
+    }))
   }
 
-  const addError = (key) => {
-    setError({
-      ...error,
+  const addError = ({ key }) => {
+    setError((prevState) => ({
+      text: prevState.text,
       keys: [...error.keys, key],
-    })
+    }))
   }
 
-  const removeChip = (key = 0) => {
+  const removeChips = (keyList = []) => {
     const chipsClone = chips.slice()
-    chipsClone.splice(key, 1)
+    keyList
+      .slice()
+      .sort((a, b) => b - a)
+      .forEach((key) => {
+        chipsClone.splice(key, 1)
+      })
     setChips(chipsClone)
+    removeErrors(keyList)
+    console.log(error)
   }
 
-  const helperSetChips = ({ value, key }) => {
+  const setChipsHelper = ({ value, key }) => {
     const chipsClone = chips.slice()
     chipsClone.splice(key, 1, ...value)
     setChips(chipsClone)
   }
 
-  const splitChips = ({ event, key }) => {
-    const val = makeChips(event.target.value)
-    helperSetChips({
-      value: val,
+  const splitChipsOnChange = ({ event, key }) => {
+    const chipValue = event.target.value
+    if (isQuotesClosed(chipValue)) {
+      removeErrors([key])
+    }
+    const chips = makeChips(chipValue)
+    const filteredChips = chips.filter(
+      (element, i) => element !== '' || i === chips.length - 1
+    )
+    setChipsHelper({
+      value: filteredChips,
       key,
     })
   }
 
-  const mainChipConvertToChip = ({ event, key }) => {
+  const splitChipsOnBlur = ({ event, key }) => {
+    const chipValue = event.target.value
+    if (isQuotesClosed(chipValue)) {
+      const chips = makeChips(chipValue)
+      const filteredChips = chips.filter((element) => element !== '')
+      setChipsHelper({
+        value: filteredChips,
+        key,
+      })
+      removeErrors([key])
+    } else {
+      addError(key)
+    }
+  }
+
+  const handleMainChip = ({ event, key }) => {
     const chipValue = event.target.value
     const isInputEmpty = !!event.target.value
     if (isQuotesClosed(chipValue)) {
-      removeError(key)
       if (isInputEmpty) setChips([...chips, ''])
+      removeErrors([key])
     } else {
       addError(key)
     }
   }
 
   const handleChip = ({ event, key }) => {
-    if (event.target.value === '') {
-      removeChip(key)
+    const chipValue = event.target.value
+    if (isQuotesClosed(chipValue)) {
+      removeErrors([key])
+    }
+    if (chipValue === '') {
+      removeChips([key])
     } else {
-      helperSetChips({
-        value: [event.target.value],
+      setChipsHelper({
+        value: [chipValue],
         key,
       })
+    }
+  }
+
+  const handleKeyPress = ({ event, key }) => {
+    if (event.key === 'Backspace' && event.target.selectionEnd === 0) {
+      removeChips([key - 1])
+    }
+  }
+
+  const addToSelection = ({ key }) => {
+    if (selection.isStarted && !selection.list.includes(key)) {
+      disableTextSelection()
+      setSelection((prevState) => ({
+        list: [...prevState.list, key],
+        isStarted: prevState.isStarted,
+      }))
+    }
+  }
+  const startSelection = () => {
+    console.log('startSelection')
+    if (!selection.isStarted) {
+      setSelection((prevState) => ({
+        list: prevState.list,
+        isStarted: true
+      }))
+    }
+  }
+  const endSelection = () => {
+    console.log('endSelection')
+    if (selection.isStarted) {
+      setSelection((prevState) => ({
+        list: prevState.list,
+        isStarted: false
+      }))
+    }
+  }
+  // setTimeout(() => {
+  //   console.log(selection)
+  // }, 100)
+  const resetSelection = () => {
+    console.log('resetSelection')
+    if (!selection.isStarted) {
+      setSelection({ ...selection, list: [] })
+    }
+  }
+
+  const deleteSelection = ({ event }) => {
+    console.log(event.key)
+    if (event.key === 'Backspace' && selection.isStarted) {
+      removeChips(selection.list)
+      resetSelection()
     }
   }
 
@@ -75,44 +174,47 @@ function ChipsInput({ value, onChange }) {
   }, [chips, onChange])
 
   return (
-    <div className="Chips">
+    <div
+      className="Chips"
+      onMouseDown={() => {
+        resetSelection()
+        startSelection()
+      }}
+      onMouseUp={() => endSelection()}
+      onMouseLeave={() => {
+        endSelection()
+        resetSelection()
+      }}
+      tabIndex={-1}
+      onKeyDown={(event) => deleteSelection({ event })}
+      ref={chipsRef}
+    >
       <ul className="ChipsInput">
         {chips.map((chip, i) =>
           i < chips.length - 1 ? (
-            <li
+            <Chip
               key={i}
-              className={`ChipsInput__tag${
-                error.keys.includes(i) ? ' error' : ''
-              }`}
-            >
-              <span className="hidden">{chip}</span>
-              <input
-                className="ChipsInput-tag__input"
-                type="text"
-                value={chip}
-                style={{
-                  width: chip.length + 1 + 'ch',
-                }}
-                onBlur={(e) => splitChips({ event: e, key: i })}
-                onChange={(e) => handleChip({ event: e, key: i })}
-              />
-              <button className="close-button" onClick={() => removeChip(i)}>
-                <CloseIcon className="close-icon" />
-              </button>
-            </li>
+              error={error}
+              searchElement={i}
+              selection={selection}
+              chip={chip}
+              onBlur={(event) => splitChipsOnBlur({ event, key: i })}
+              onChange={(event) => handleChip({ event, key: i })}
+              closeButtonOnClick={() => removeChips([i])}
+              onMouseOver={() => addToSelection({ key: i })}
+            />
           ) : null
         )}
-        <input
-          className={`ChipsInput__input${
-            error.keys.includes(chips.length - 1) ? ' error' : ''
-          }`}
-          type="text"
-          value={chips[chips.length - 1]}
-          placeholder={chips.length > 1 ? '' : 'Введите'}
-          onBlur={(e) =>
-            mainChipConvertToChip({ event: e, key: chips.length - 1 })
+        <MainChip
+          error={error}
+          strings={chips}
+          onBlur={(event) => handleMainChip({ event, key: chips.length - 1 })}
+          onChange={(event) =>
+            splitChipsOnChange({ event, key: chips.length - 1 })
           }
-          onChange={(e) => splitChips({ event: e, key: chips.length - 1 })}
+          onKeyDown={(event) =>
+            handleKeyPress({ event, key: chips.length - 1 })
+          }
         />
       </ul>
       <label
