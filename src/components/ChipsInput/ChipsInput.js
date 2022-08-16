@@ -53,7 +53,6 @@ function ChipsInput({ value, onChange }) {
       })
     setChips(chipsClone)
     removeErrors(keyList)
-    console.log(error)
   }
 
   const setChipsHelper = ({ value, key }) => {
@@ -134,7 +133,6 @@ function ChipsInput({ value, onChange }) {
     }
   }
   const startSelection = () => {
-    console.log('startSelection')
     if (!selection.isStarted) {
       setSelection((prevState) => ({
         list: prevState.list,
@@ -143,7 +141,6 @@ function ChipsInput({ value, onChange }) {
     }
   }
   const endSelection = () => {
-    console.log('endSelection')
     if (selection.isStarted) {
       setSelection((prevState) => ({
         list: prevState.list,
@@ -151,18 +148,14 @@ function ChipsInput({ value, onChange }) {
       }))
     }
   }
-  // setTimeout(() => {
-  //   console.log(selection)
-  // }, 100)
+
   const resetSelection = () => {
-    console.log('resetSelection')
     if (!selection.isStarted) {
       setSelection({ ...selection, list: [] })
     }
   }
 
   const deleteSelection = ({ event }) => {
-    console.log(event.key)
     if (event.key === 'Backspace' && selection.isStarted) {
       removeChips(selection.list)
       resetSelection()
