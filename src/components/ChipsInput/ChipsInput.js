@@ -156,7 +156,7 @@ function ChipsInput({ value, onChange }) {
   }
 
   const deleteSelection = ({ event }) => {
-    if (event.key === 'Backspace' && selection.isStarted) {
+    if ( (event.key === 'Backspace' || event.key === 'Delete') && selection.isStarted) {
       removeChips(selection.list)
       resetSelection()
     }
