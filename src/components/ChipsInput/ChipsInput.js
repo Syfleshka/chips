@@ -19,30 +19,18 @@ function ChipsInput({ value, onChange }) {
 
   const isQuotesClosed = (value) => (value.match(/"/g) || []).length % 2 === 0
 
-  const removeErrors = useCallback((keyList = []) => {
-    const errorKeys = error.keys.slice()
-    keyList
-      .slice()
-      .sort((a, b) => b - a)
-      .forEach((key) => {
-        const index = error.keys.indexOf(key)
-        if (index !== -1) {
-          errorKeys.splice(index, 1)
-        }
-      })
-    setError((prevState) => ({
-      text: prevState.text,
-      keys: errorKeys,
-    }))
-  }, [error.keys])
-
-  const addError = ({ key }) => {
-    setError((prevState) => ({
-      text: prevState.text,
-      keys: [...error.keys, key],
-    }))
-  }
-  console.log(error)
+  const checkErrors = useCallback(() => {
+    const errorList = []
+    chips.forEach((chip, key) => {
+      if (!isQuotesClosed(chip)) errorList.push(key)
+    })
+    if (errorList.length) {
+      setError((prevState) => ({
+        text: prevState.text,
+        keys: errorList,
+      }))
+    }
+  }, [chips])
 
   const removeChips = useCallback((keyList = []) => {
     const chipsClone = chips.slice()
@@ -52,20 +40,22 @@ function ChipsInput({ value, onChange }) {
       .forEach((key) => {
         chipsClone.splice(key, 1)
       })
-    setChips(chipsClone)
-    removeErrors(keyList)
-  }, [chips, removeErrors])
+    const promise = new Promise((resolve) => {
+      resolve(setChips(() => chipsClone))
+    })
+    promise.then(() => checkErrors())
+  }, [chips, checkErrors])
 
   const setChipsHelper = ({ value, key }) => {
     const chipsClone = chips.slice()
     chipsClone.splice(key, 1, ...value)
-    setChips(chipsClone)
+    setChips(() => chipsClone)
   }
 
   const splitChipsOnChange = ({ event, key }) => {
     const chipValue = event.target.value
     if (isQuotesClosed(chipValue)) {
-      removeErrors([key])
+      checkErrors()
     }
     const chips = makeChips(chipValue)
     const filteredChips = chips.filter(
@@ -86,27 +76,23 @@ function ChipsInput({ value, onChange }) {
         value: filteredChips,
         key,
       })
-      removeErrors([key])
-    } else {
-      addError({key})
     }
+    checkErrors()
   }
 
-  const handleMainChip = ({ event, key }) => {
+  const handleMainChip = ({ event }) => {
     const chipValue = event.target.value
     const isInputEmpty = !!event.target.value
     if (isQuotesClosed(chipValue)) {
-      if (isInputEmpty) setChips([...chips, ''])
-      removeErrors([key])
-    } else {
-      addError({key})
+      if (isInputEmpty) setChips((prevState) => [...prevState, ''])
     }
+    checkErrors()
   }
 
   const handleChip = ({ event, key }) => {
     const chipValue = event.target.value
     if (isQuotesClosed(chipValue)) {
-      removeErrors([key])
+      checkErrors()
     }
     if (chipValue === '') {
       removeChips([key])
