@@ -20,6 +20,10 @@
   border: 1px solid white;
   border-radius: 6px;
   outline: none;
+  transition: border 0.1s ease-in-out;
+}
+.ChipsInput.error {
+  border: solid 1px brown;
 }
 
 .ChipsInput__tag {
@@ -42,7 +46,7 @@
   cursor: pointer;
 }
 .ChipsInput__tag:hover {
-  border: 1px solid #cecece;
+  border: 1px solid #b0b0b0;
 }
 .ChipsInput__tag.active {
   border: 1px solid #ffffff;

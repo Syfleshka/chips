@@ -1,9 +1,7 @@
-export function MainChip({ error, strings, onBlur, onChange, onKeyDown }) {
+export function MainChip({ strings, onBlur, onChange, onKeyDown }) {
   return (
     <input
-      className={`ChipsInput__input${
-        error.keys.includes(strings.length - 1) ? ' error' : ''
-      }`}
+      className={`ChipsInput__input`}
       type="text"
       onKeyDown={onKeyDown}
       value={strings[strings.length - 1]}

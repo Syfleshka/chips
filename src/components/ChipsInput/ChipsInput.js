@@ -24,27 +24,25 @@ function ChipsInput({ value, onChange }) {
     chips.forEach((chip, key) => {
       if (!isQuotesClosed(chip)) errorList.push(key)
     })
-    if (errorList.length) {
-      setError((prevState) => ({
-        text: prevState.text,
-        keys: errorList,
-      }))
-    }
+    setError((prevState) => ({
+      text: prevState.text,
+      keys: errorList,
+    }))
   }, [chips])
 
-  const removeChips = useCallback((keyList = []) => {
-    const chipsClone = chips.slice()
-    keyList
-      .slice()
-      .sort((a, b) => b - a)
-      .forEach((key) => {
-        chipsClone.splice(key, 1)
-      })
-    const promise = new Promise((resolve) => {
-      resolve(setChips(() => chipsClone))
-    })
-    promise.then(() => checkErrors())
-  }, [chips, checkErrors])
+  const removeChips = useCallback(
+    (keyList = []) => {
+      const chipsClone = chips.slice()
+      keyList
+        .slice()
+        .sort((a, b) => b - a)
+        .forEach((key) => {
+          chipsClone.splice(key, 1)
+        })
+      setChips(() => chipsClone)
+    },
+    [chips]
+  )
 
   const setChipsHelper = ({ value, key }) => {
     const chipsClone = chips.slice()
@@ -54,9 +52,6 @@ function ChipsInput({ value, onChange }) {
 
   const splitChipsOnChange = ({ event, key }) => {
     const chipValue = event.target.value
-    if (isQuotesClosed(chipValue)) {
-      checkErrors()
-    }
     const chips = makeChips(chipValue)
     const filteredChips = chips.filter(
       (element, i) => element !== '' || i === chips.length - 1
@@ -77,7 +72,6 @@ function ChipsInput({ value, onChange }) {
         key,
       })
     }
-    checkErrors()
   }
 
   const handleMainChip = ({ event }) => {
@@ -86,14 +80,10 @@ function ChipsInput({ value, onChange }) {
     if (isQuotesClosed(chipValue)) {
       if (isInputEmpty) setChips((prevState) => [...prevState, ''])
     }
-    checkErrors()
   }
 
   const handleChip = ({ event, key }) => {
     const chipValue = event.target.value
-    if (isQuotesClosed(chipValue)) {
-      checkErrors()
-    }
     if (chipValue === '') {
       removeChips([key])
     } else {
@@ -106,7 +96,7 @@ function ChipsInput({ value, onChange }) {
 
   const handleKeyPress = ({ event, key }) => {
     if (
-      event.key === 'Backspace'&&
+      event.key === 'Backspace' &&
       event.target.selectionEnd === 0 &&
       event.target.selectionStart === 0 &&
       selection.list.length === 0
@@ -131,7 +121,7 @@ function ChipsInput({ value, onChange }) {
         isStarted: true,
       }))
     }
-  },[selection.isStarted])
+  }, [selection.isStarted])
   const endSelection = useCallback(() => {
     if (selection.isStarted) {
       setSelection((prevState) => ({
@@ -139,13 +129,13 @@ function ChipsInput({ value, onChange }) {
         isStarted: false,
       }))
     }
-  },[selection.isStarted])
+  }, [selection.isStarted])
 
   const resetSelection = useCallback(() => {
     if (!selection.isStarted) {
       setSelection({ ...selection, list: [] })
     }
-  },[selection])
+  }, [selection])
 
   useEffect(() => {
     onChange(chips.join(','))
@@ -162,6 +152,8 @@ function ChipsInput({ value, onChange }) {
       startSelection()
     }
 
+    checkErrors()
+
     document.addEventListener('keyup', deleteSelection)
     document.addEventListener('mousedown', mouseDownSelection)
     document.addEventListener('mouseup', endSelection)
@@ -170,7 +162,16 @@ function ChipsInput({ value, onChange }) {
       document.removeEventListener('mousedown', mouseDownSelection)
       document.removeEventListener('mouseup', endSelection)
     }
-  }, [chips, onChange, removeChips, resetSelection, selection.list, startSelection, endSelection])
+  }, [
+    chips,
+    onChange,
+    removeChips,
+    resetSelection,
+    selection.list,
+    startSelection,
+    endSelection,
+    checkErrors,
+  ])
 
   return (
     <div
@@ -181,7 +182,7 @@ function ChipsInput({ value, onChange }) {
       tabIndex={-1}
       ref={chipsRef}
     >
-      <ul className="ChipsInput">
+      <ul className={`ChipsInput ${error.keys.includes(chips.length - 1) ? ' error' : ''}`}>
         {chips.map((chip, i) =>
           i < chips.length - 1 ? (
             <Chip

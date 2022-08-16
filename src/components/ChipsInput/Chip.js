@@ -1,5 +1,5 @@
 import CloseIcon from './CloseIcon'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
 function Chip({
   error,
@@ -23,6 +23,9 @@ function Chip({
     onBlur(event)
     setIsSelected(false)
   }
+  useEffect(() => {
+    if (selection.list.includes(searchElement)) setIsSelected(false)
+  },[searchElement, selection.list])
   return (
     <li
       className={`ChipsInput__tag${
