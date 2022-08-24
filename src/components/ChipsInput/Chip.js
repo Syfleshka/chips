@@ -9,7 +9,7 @@ function Chip({
   onBlur,
   onChange,
   closeButtonOnClick,
-  onMouseOver
+  onMouseOver,
 }) {
   const [isSelected, setIsSelected] = useState(false)
 
@@ -25,16 +25,19 @@ function Chip({
   }
   useEffect(() => {
     if (selection.list.includes(searchElement)) setIsSelected(false)
-  },[searchElement, selection.list])
+  }, [searchElement, selection.list])
+
   return (
     <li
       className={`ChipsInput__tag${
-        error.keys.includes(searchElement) ? ' error' : ''}${
-        selection.list.includes(searchElement) ? ' selected' : ''}${
+        error.keys.includes(searchElement) ? ' error' : ''
+      }${selection.list.includes(searchElement) ? ' selected' : ''}${
         isSelected ? ' active' : ''
       }`}
       onMouseOver={onMouseOver}
-      onClick={(event) => {selectChip(event)}}
+      onClick={(event) => {
+        selectChip(event)
+      }}
     >
       <input
         className="ChipsInput-tag__input"
@@ -43,7 +46,9 @@ function Chip({
         style={{
           width: chip.length + 1 + 'ch',
         }}
-        onBlur={(event) => {unSelectChip(event)}}
+        onBlur={(event) => {
+          unSelectChip(event)
+        }}
         onChange={onChange}
         disabled={selection.list.includes(searchElement)}
       />

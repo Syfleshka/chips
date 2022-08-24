@@ -1,4 +1,4 @@
-export function MainChip({ strings, onBlur, onChange, onKeyDown }) {
+export function MainInput({ strings, onBlur, onChange, onKeyDown }) {
   return (
     <input
       className={`ChipsInput__input`}

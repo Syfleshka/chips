@@ -2,7 +2,7 @@ import './ChipsInput.scss'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { makeChips } from './makeChips'
 import Chip from './Chip'
-import { MainChip } from './MainChip'
+import { MainInput } from './MainInput'
 import { disableTextSelection } from './disableTextSelection'
 
 function ChipsInput({ value, onChange }) {
@@ -39,7 +39,7 @@ function ChipsInput({ value, onChange }) {
         .forEach((key) => {
           chipsClone.splice(key, 1)
         })
-      setChips(() => chipsClone)
+      setChips(chipsClone)
     },
     [chips]
   )
@@ -47,10 +47,10 @@ function ChipsInput({ value, onChange }) {
   const setChipsHelper = ({ value, key }) => {
     const chipsClone = chips.slice()
     chipsClone.splice(key, 1, ...value)
-    setChips(() => chipsClone)
+    setChips(chipsClone)
   }
 
-  const splitChipsOnChange = ({ event, key }) => {
+  const handleMainInputOnChange = ({ event, key }) => {
     const chipValue = event.target.value
     const chips = makeChips(chipValue)
     const filteredChips = chips.filter(
@@ -62,7 +62,7 @@ function ChipsInput({ value, onChange }) {
     })
   }
 
-  const splitChipsOnBlur = ({ event, key }) => {
+  const handleChipOnBlur = ({ event, key }) => {
     const chipValue = event.target.value
     if (isQuotesClosed(chipValue)) {
       const chips = makeChips(chipValue)
@@ -74,7 +74,7 @@ function ChipsInput({ value, onChange }) {
     }
   }
 
-  const handleMainChip = ({ event }) => {
+  const handleMainInputOnBlur = ({ event }) => {
     const chipValue = event.target.value
     const isInputEmpty = !!event.target.value
     if (isQuotesClosed(chipValue)) {
@@ -82,7 +82,7 @@ function ChipsInput({ value, onChange }) {
     }
   }
 
-  const handleChip = ({ event, key }) => {
+  const handleChipOnChange = ({ event, key }) => {
     const chipValue = event.target.value
     if (chipValue === '') {
       removeChips([key])
@@ -138,7 +138,7 @@ function ChipsInput({ value, onChange }) {
   }, [selection])
 
   useEffect(() => {
-    onChange(chips.join(','))
+    onChange(chips.join(', '))
 
     const deleteSelection = (event) => {
       if (event.key === 'Delete') {
@@ -176,13 +176,15 @@ function ChipsInput({ value, onChange }) {
   return (
     <div
       className="Chips"
-      onMouseLeave={() => {
-        endSelection()
-      }}
+      onMouseLeave={() => endSelection()}
       tabIndex={-1}
       ref={chipsRef}
     >
-      <ul className={`ChipsInput ${error.keys.includes(chips.length - 1) ? ' error' : ''}`}>
+      <ul
+        className={`ChipsInput ${
+          error.keys.includes(chips.length - 1) ? ' error' : ''
+        }`}
+      >
         {chips.map((chip, i) =>
           i < chips.length - 1 ? (
             <Chip
@@ -191,19 +193,21 @@ function ChipsInput({ value, onChange }) {
               searchElement={i}
               selection={selection}
               chip={chip}
-              onBlur={(event) => splitChipsOnBlur({ event, key: i })}
-              onChange={(event) => handleChip({ event, key: i })}
+              onBlur={(event) => handleChipOnBlur({ event, key: i })}
+              onChange={(event) => handleChipOnChange({ event, key: i })}
               closeButtonOnClick={() => removeChips([i])}
               onMouseOver={() => addToSelection({ key: i })}
             />
           ) : null
         )}
-        <MainChip
+        <MainInput
           error={error}
           strings={chips}
-          onBlur={(event) => handleMainChip({ event, key: chips.length - 1 })}
+          onBlur={(event) =>
+            handleMainInputOnBlur({ event, key: chips.length - 1 })
+          }
           onChange={(event) =>
-            splitChipsOnChange({ event, key: chips.length - 1 })
+            handleMainInputOnChange({ event, key: chips.length - 1 })
           }
           onKeyDown={(event) =>
             handleKeyPress({ event, key: chips.length - 1 })
