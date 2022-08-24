@@ -26,3 +26,6 @@
   onChange=function
 />
 ```
+## Стек
+
+- create-react-app
