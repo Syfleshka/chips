@@ -3,7 +3,7 @@ import ChipsInput from './components/ChipsInput/ChipsInput'
 import { useState } from 'react'
 
 function App() {
-  const [value, setValue] = useState('это первый чипс, это "второй," чипс')
+  const [value, setValue] = useState('This is first chip, this is "isolated, comma" second one, this will be third')
   return (
     <>
       <div className="Logo">
@@ -12,7 +12,7 @@ function App() {
       <div className="App">
         <ChipsInput value={value} onChange={setValue} />
         <p className="App__string">
-          Строка: <br />
+          Output: <br />
           {value}
         </p>
       </div>
