@@ -26,6 +26,6 @@
   onChange=function
 />
 ```
-## Стек
+## Packages
 
 - create-react-app
