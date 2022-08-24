@@ -1,13 +1,14 @@
 import './App.scss'
 import ChipsInput from './components/ChipsInput/ChipsInput'
 import { useState } from 'react'
+import logo from './logo512.png'
 
 function App() {
   const [value, setValue] = useState('This is first chip, this is "isolated, comma" second one, this will be third')
   return (
     <>
       <div className="Logo">
-        <img className="Logo__img" src={'/logo512.png'} alt="Chips" />
+        <img className="Logo__img" src={logo} alt="Chips" />
       </div>
       <div className="App">
         <ChipsInput value={value} onChange={setValue} />
